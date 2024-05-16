@@ -49,14 +49,14 @@ def main():
             sell_signal.append((t, latest_rsi))
         else:
             pass
-    col1, col2 = st.columns(2)
+    col1, col2 = st.tabs(['Buy signal', 'Sell signal'])
     with col1:
-        st.markdown('## Buy signal')
+        # st.markdown('## Buy signal')
         for b in buy_signal:
             st.metric(label="RSI", value=b[0], delta=b[1], delta_color="normal")
 
     with col2:
-        st.markdown('## Sell signal')
+        # st.markdown('## Sell signal')
         for s in sell_signal:
             st.metric(label="RSI", value=s[0], delta=s[1], delta_color="inverse")   
 
