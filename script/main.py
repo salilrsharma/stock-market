@@ -1,9 +1,11 @@
 import pandas as pd
+import ta.momentum
 import yfinance as yf
 import plotly.express as px
 import numpy as np
 from datetime import datetime, timedelta
 import streamlit as st
+import ta
 
 st.write(
     """
@@ -41,7 +43,7 @@ def main():
     for t in ticker_list:
         data = yf.download(t, start=start_date, end=end_date)
         # Compute RSI
-        data['RSI'] = compute_rsi(data)
+        data['RSI'] = ta.momentum.RSIIndicator(data['Close']).rsi()#compute_rsi(data)
         latest_rsi = data['RSI'].iloc[-1]
         if latest_rsi < 30:
             buy_signal.append((t, latest_rsi))
