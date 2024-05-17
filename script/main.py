@@ -22,7 +22,7 @@ st.write(
 
 def main():
     # Replace 'TICKER' with the symbol of the stock you want to analyze
-    ticker_list = ['TSLA', 'AAPL']
+    ticker_list = ['TSLA', 'AAPL', '^GSPC']
     # Replace 'START_DATE' and 'END_DATE' with the date range you want to analyze
     # Define start and end dates
     end_date = datetime.today().strftime('%Y-%m-%d')
@@ -40,12 +40,14 @@ def main():
         data['RSI'] = ta.momentum.RSIIndicator(data['Close']).rsi()
         data['MACD'] = ta.trend.MACD(data['Close']).macd()
         data['MACD_SIGNAL'] = ta.trend.MACD(data['Close']).macd_signal() 
+        data['MACD_DIFF'] = data['MACD'] - data['MACD_SIGNAL']
         
         try:
             latest_rsi = data['RSI'].iloc[-1]
-            if latest_rsi < 30:
+            latest_macd_diff = data['MACD_DIFF'].iloc[-1]
+            if latest_rsi < 30 & latest_macd_diff > 0:
                 buy_signal.append((t, latest_rsi))
-            elif latest_rsi > 70:
+            elif latest_rsi > 70 & latest_macd_diff < 0:
                 sell_signal.append((t, latest_rsi))
             else:
                 pass
