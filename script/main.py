@@ -36,10 +36,10 @@ def main():
     # Fetch data from yfinance
     for t in ticker_list[:10]:
         data = yf.download(t, start=start_date, end=end_date)
-        # Compute RSI
+        # Compute RSI from ta 
         data['RSI'] = ta.momentum.RSIIndicator(data['Close']).rsi()
         data['MACD'] = ta.trend.MACD(data['Close']).macd()
-        data['MACD_SIGNAL'] = ta.trend.MACD(data['Close']).macd_signal()
+        data['MACD_SIGNAL'] = ta.trend.MACD(data['Close']).macd_signal() 
         
         try:
             latest_rsi = data['RSI'].iloc[-1]
