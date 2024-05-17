@@ -22,9 +22,7 @@ st.write(
 
 def main():
     # Replace 'TICKER' with the symbol of the stock you want to analyze
-    ticker_list = ['TSLA', 'AAPL', 'NIO', '^GSPC', 'RIVN']
-    # with open(r"./data/sp500tickers.pickle", "rb") as f:
-    #     ticker_list = pickle.load(f)
+    ticker_list = ['TSLA', 'AAPL']
     # Replace 'START_DATE' and 'END_DATE' with the date range you want to analyze
     # Define start and end dates
     end_date = datetime.today().strftime('%Y-%m-%d')
