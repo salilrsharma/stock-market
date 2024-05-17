@@ -1,11 +1,13 @@
 import pandas as pd
 import ta.momentum
+import ta.trend
 import yfinance as yf
 import plotly.express as px
 import numpy as np
 from datetime import datetime, timedelta
 import streamlit as st
 import ta
+import pickle
 
 st.write(
     """
@@ -18,21 +20,15 @@ st.write(
     unsafe_allow_html=True,
 )
 
-def compute_rsi(data, window=14):
-    delta = data['Adj Close'].diff()
-    gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
-    loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
-    rs = gain / loss
-    rsi = 100 - (100 / (1 + rs))
-    return rsi
-
 def main():
     # Replace 'TICKER' with the symbol of the stock you want to analyze
-    ticker_list = ['TSLA', 'AAPL']
+    ticker_list = ['TSLA', 'AAPL', 'NIO', '^GSPC', 'RIVN']
+    # with open(r"./data/sp500tickers.pickle", "rb") as f:
+    #     ticker_list = pickle.load(f)
     # Replace 'START_DATE' and 'END_DATE' with the date range you want to analyze
     # Define start and end dates
     end_date = datetime.today().strftime('%Y-%m-%d')
-    start_date = (datetime.today() - timedelta(days=180)).strftime('%Y-%m-%d')
+    start_date = (datetime.today() - timedelta(days=90)).strftime('%Y-%m-%d')
     
     st.title('Stock market data')
 
@@ -40,17 +36,23 @@ def main():
     sell_signal = []
 
     # Fetch data from yfinance
-    for t in ticker_list:
+    for t in ticker_list[:10]:
         data = yf.download(t, start=start_date, end=end_date)
         # Compute RSI
-        data['RSI'] = ta.momentum.RSIIndicator(data['Close']).rsi()#compute_rsi(data)
-        latest_rsi = data['RSI'].iloc[-1]
-        if latest_rsi < 30:
-            buy_signal.append((t, latest_rsi))
-        elif latest_rsi > 70:
-            sell_signal.append((t, latest_rsi))
-        else:
-            pass
+        data['RSI'] = ta.momentum.RSIIndicator(data['Close']).rsi()
+        data['MACD'] = ta.trend.MACD(data['Close']).macd()
+        data['MACD_SIGNAL'] = ta.trend.MACD(data['Close']).macd_signal()
+        
+        try:
+            latest_rsi = data['RSI'].iloc[-1]
+            if latest_rsi < 30:
+                buy_signal.append((t, latest_rsi))
+            elif latest_rsi > 70:
+                sell_signal.append((t, latest_rsi))
+            else:
+                pass
+        except IndexError:
+            print("Exception")
     col1, col2 = st.tabs(['Buy signal', 'Sell signal'])
     with col1:
         # st.markdown('## Buy signal')
